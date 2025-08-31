@@ -81,11 +81,12 @@ export async function writeKV(key: string = "default-key", value: string): Promi
                 timeout
             ]);
             let result = await getKV(key); // 写入后验证
+            console.info("result:", result);    
             if (result === value) {
-                console.log(`Successfully wrote and verified KV for key "${key}"`);
+                console.info(`Successfully wrote and verified KV for key "${key}"`);
                 return true;
             } else {
-                console.error(`KV verification failed for key "${key}": expected "${value}", got "${getKV}"`);
+                console.info(`KV verification failed for key "${key}": expected "${value}", got "${result}"`);
                 return false;
             }
         } catch (kvError) {

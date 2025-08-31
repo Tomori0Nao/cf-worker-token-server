@@ -5,8 +5,12 @@ const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.post("/token/generate", async (c) => {
   let token = await generateRandomToken(64)
-  writeKV("token-1", token);
-  return c.text("Token generated: " + token);
+  let result = await writeKV("token-1", token);
+  if (!result) {
+    return c.text("Failed to write token to KV", 500);
+  } else {
+    return c.text("Token generated: " + token);
+  }
 });
 app.post("/token/verify", async (c) => {
   let body = await c.req.json();
