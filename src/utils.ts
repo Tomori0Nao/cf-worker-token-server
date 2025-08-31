@@ -76,10 +76,18 @@ export async function writeKV(key: string = "default-key", value: string): Promi
         
         try {
             // 正确使用 Cloudflare KV API 并添加超时处理
-            const result = await Promise.race([
+            await Promise.race([
                 env.token.put(key, value),
                 timeout
             ]);
+            let result = await getKV(key); // 写入后验证
+            if (result === value) {
+                console.log(`Successfully wrote and verified KV for key "${key}"`);
+                return true;
+            } else {
+                console.error(`KV verification failed for key "${key}": expected "${value}", got "${getKV}"`);
+                return false;
+            }
         } catch (kvError) {
             if (kvError instanceof Error && kvError.message.includes('timed out')) {
                 console.error(`KV operation timed out for key "${key}"`);
