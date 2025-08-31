@@ -20,9 +20,9 @@ app.post("/token/verify", async (c) => {
   console.log("Stored token:", storedToken);
   console.log("Provided token:", token);
   if (token === storedToken) {
-    return c.json({ valid: true });
+    return c.json({ isValid: true });
   } else {
-    return c.json({ valid: false }, 401);
+    return c.json({ isValid: false }, 401);
   }
   
 });
