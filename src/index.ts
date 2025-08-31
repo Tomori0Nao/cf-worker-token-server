@@ -26,4 +26,14 @@ app.post("/token/verify", async (c) => {
   }
   
 });
+app.post("/token/get", async (c) => {
+  let result = await getKV("token-1");
+  console.info("Retrieved token:", result);
+  if (!result) {
+    return c.json("Failed to retrieve token", 500);
+  } else {
+    return c.json({ token: result });
+  }
+});
+
 export default app;
