@@ -1,11 +1,15 @@
 import { Hono } from "hono";
-import { generateRandomToken, getKV, isTokenExpired, writeKV } from "./utils";
+import { generateRandomToken, getCurrentTimeStamp, getKV, isTokenExpired, writeKV } from "./utils";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.post("/token/generate", async (c) => {
   let token = await generateRandomToken(64)
   let result = await writeKV("token-1", token);
+  let currentTimeStamp = getCurrentTimeStamp();
+  console.log("Current Time:", currentTimeStamp);
+  console.log("New Token:", token);
+  await writeKV("generate-time", currentTimeStamp.toString());
   if (!result) {
     return c.text("Failed to write token to KV", 500);
   } else {
@@ -16,6 +20,10 @@ app.post("/token/generate", async (c) => {
 app.post("/token/verify", async (c) => {
   if (await isTokenExpired()) {
     let token = await generateRandomToken(64)
+    let currentTime = getCurrentTimeStamp();
+    console.log("Current Time:", currentTime);
+    console.log("New Token:", token);
+    await writeKV("generate-time", currentTime.toString());
     await writeKV("token-1", token);
     return c.json({ isValid: false, reason: "Token expired" }, 401);
   } else {
