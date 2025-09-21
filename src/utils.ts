@@ -133,4 +133,28 @@ async function generateRandomToken(length = 64): Promise<string> {
     throw new Error(`Failed to generate token: ${error}`);
   }
 }
+// check if token expired by reading the expiry time from KV
+export function getCurrentTimeStamp(): number {
+   const utcTimestampSeconds = Math.floor(Date.now() / 1000); // 当前时间的UTC时间戳，单位为秒
+    return utcTimestampSeconds;
+}
+export async function getExpiryTime(): Promise<number> {
+    const expiryTimestamp = await getKV("expire-time");
+    return expiryTimestamp ? parseInt(expiryTimestamp) : 0;
+}
+export async function getGenerateTime(): Promise<number> {
+    const generateTimestamp = await getKV("generate-time");
+    return generateTimestamp ? parseInt(generateTimestamp) : 0;
+}
+export async function getExpiryTimeStamp(): Promise<number> {
+    const expiryTimestamp = await getExpiryTime() + await getGenerateTime();
+    return expiryTimestamp;
+}
+export async function isTokenExpired(): Promise<boolean> {
+    const currentTime = getCurrentTimeStamp();
+    const expiryTime = await getExpiryTimeStamp();
+    console.info(`Current time: ${currentTime}, Expiry time: ${expiryTime}`);
+    return currentTime >= expiryTime;
+}
+
 export { generateRandomToken };

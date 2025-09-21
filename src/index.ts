@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { generateRandomToken, getKV, writeKV } from "./utils";
+import { generateRandomToken, getKV, isTokenExpired, writeKV } from "./utils";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -12,19 +12,25 @@ app.post("/token/generate", async (c) => {
     return c.text("Token generated: " + token);
   }
 });
+
 app.post("/token/verify", async (c) => {
-  let body = await c.req.json();
-  console.info("Request body:", body);
-  let  token  = body["token"];
-  let storedToken = await getKV("token-1");
-  console.log("Stored token:", storedToken);
-  console.log("Provided token:", token);
-  if (token === storedToken) {
-    return c.json({ isValid: true });
+  if (await isTokenExpired()) {
+    let token = await generateRandomToken(64)
+    await writeKV("token-1", token);
+    return c.json({ isValid: false, reason: "Token expired" }, 401);
   } else {
-    return c.json({ isValid: false }, 401);
+    let body = await c.req.json();
+    console.info("Request body:", body);
+    let token = body["token"];
+    let storedToken = await getKV("token-1");
+    console.log("Stored token:", storedToken);
+    console.log("Provided token:", token);
+    if (token === storedToken) {
+      return c.json({ isValid: true });
+    } else {
+      return c.json({ isValid: false }, 401);
+    }
   }
-  
 });
 app.post("/token/get", async (c) => {
   let result = await getKV("token-1");
