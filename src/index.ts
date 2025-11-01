@@ -11,9 +11,9 @@ app.post("/token/generate", async (c) => {
   console.log("New Token:", token);
   await writeKV("generate-time", currentTimeStamp.toString());
   if (!result) {
-    return c.text("Failed to write token to KV", 500);
+    return c.json("Failed to write token", 500);
   } else {
-    return c.text("Token generated: " + token);
+    return c.json({ token: result });
   }
 });
 
