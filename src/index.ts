@@ -13,7 +13,7 @@ app.post("/token/generate", async (c) => {
   if (!result) {
     return c.json("Failed to write token", 500);
   } else {
-    return c.json({ token: result });
+    return c.json({ token: token });
   }
 });
 
