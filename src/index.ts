@@ -20,7 +20,7 @@ app.post("/token/:user/generate", async (c) => {
 
 app.post("/token/:user/verify", async (c) => {
   let user = c.req.param("user");
-  if (await isTokenExpired()) {
+  if (await isTokenExpired(user)) {
     let token = await generateRandomToken(64)
     let currentTime = getCurrentTimeStamp();
     // console.log("Current Time:", currentTime);

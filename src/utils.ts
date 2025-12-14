@@ -81,7 +81,7 @@ export async function writeKV(key: string = "default-key", value: string): Promi
                 timeout
             ]);
             let result = await getKV(key); // 写入后验证
-            console.info("result:", result);    
+            // console.info("result:", result);    
             if (result === value) {
                 // console.info(`Successfully wrote and verified KV for key "${key}"`);
                 return true;
@@ -138,21 +138,21 @@ export function getCurrentTimeStamp(): number {
    const utcTimestampSeconds = Math.floor(Date.now() / 1000); // 当前时间的UTC时间戳，单位为秒
     return utcTimestampSeconds;
 }
-export async function getExpiryTime(): Promise<number> {
-    const expiryTimestamp = await getKV("expire-time");
+export async function getExpiryTime(user:string): Promise<number> {
+    const expiryTimestamp = await getKV(`expire-time-${user}`);
     return expiryTimestamp ? parseInt(expiryTimestamp) : 0;
 }
-export async function getGenerateTime(): Promise<number> {
-    const generateTimestamp = await getKV("generate-time");
+export async function getGenerateTime(user:string): Promise<number> {
+    const generateTimestamp = await getKV(`generate-time-${user}`);
     return generateTimestamp ? parseInt(generateTimestamp) : 0;
 }
-export async function getExpiryTimeStamp(): Promise<number> {
-    const expiryTimestamp = await getExpiryTime() + await getGenerateTime();
+export async function getExpiryTimeStamp(user:string): Promise<number> {
+    const expiryTimestamp = await getExpiryTime(user) + await getGenerateTime(user);
     return expiryTimestamp;
 }
-export async function isTokenExpired(): Promise<boolean> {
+export async function isTokenExpired(user:string): Promise<boolean> {
     const currentTime = getCurrentTimeStamp();
-    const expiryTime = await getExpiryTimeStamp();
+    const expiryTime = await getExpiryTimeStamp(user);
     // console.info(`Current time: ${currentTime}, Expiry time: ${expiryTime}`);
     return currentTime >= expiryTime;
 }
