@@ -83,10 +83,10 @@ export async function writeKV(key: string = "default-key", value: string): Promi
             let result = await getKV(key); // 写入后验证
             console.info("result:", result);    
             if (result === value) {
-                console.info(`Successfully wrote and verified KV for key "${key}"`);
+                // console.info(`Successfully wrote and verified KV for key "${key}"`);
                 return true;
             } else {
-                console.info(`KV verification failed for key "${key}": expected "${value}", got "${result}"`);
+                // console.info(`KV verification failed for key "${key}": expected "${value}", got "${result}"`);
                 return false;
             }
         } catch (kvError) {
@@ -153,7 +153,7 @@ export async function getExpiryTimeStamp(): Promise<number> {
 export async function isTokenExpired(): Promise<boolean> {
     const currentTime = getCurrentTimeStamp();
     const expiryTime = await getExpiryTimeStamp();
-    console.info(`Current time: ${currentTime}, Expiry time: ${expiryTime}`);
+    // console.info(`Current time: ${currentTime}, Expiry time: ${expiryTime}`);
     return currentTime >= expiryTime;
 }
 
